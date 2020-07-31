@@ -1,0 +1,36 @@
+{
+  "name": "app-node",
+  "version": "0.1.0",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "@bugsnag/node": "^7.2.1",
+    "@types/uuid": "^8.0.0",
+    "aws-sdk": "2.724.0",
+    "luxon": "^1.24.1",
+    "uuid": "^8.3.0"
+  },
+  "devDependencies": {
+    "@types/luxon": "^1.24.3",
+    "@types/node": "^14.0.27",
+    "@types/uuid": "^8.0.0",
+    "jest-circus": "^26.2.1",
+    "shx": "^0.3.2",
+    "eslint": "^7.5.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prettier": "^3.1.4",
+    "prettier": "^2.0.5"
+  },
+  "scripts": {
+    "dist": "yarn clean+build+bundle",
+    "test:unit": "jest --config=jest.config.unit.js --coverage",
+    "test:e2e": "jest --config=jest.config.e2e.js --runInBand --testRunner='jest-circus/runner'",
+    "upgrade:show": "ncu",
+    "upgrade:do": "ncu -u",
+    "clean+build+bundle": "yarn clean && yarn build && yarn bundle",
+    "clean": "shx rm -rf dist/ && shx rm -rf coverage/",
+    "build": "tsc",
+    "bundle": "shx mkdir -p dist/layer/nodejs &&  shx cp yarn.lock dist/layer/nodejs &&  shx cp package.json dist/layer/nodejs && yarn --cwd dist/layer/nodejs --production install"
+  }
+}

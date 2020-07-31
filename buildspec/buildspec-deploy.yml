@@ -1,0 +1,9 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - yarn install
+  build:
+    commands:
+      - yarn deploy

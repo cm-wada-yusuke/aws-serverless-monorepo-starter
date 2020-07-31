@@ -1,0 +1,60 @@
+{
+  "name": "template-aws-cdk-typescript-serverless-app",
+  "version": "0.1.0",
+  "description": "serverless greeting service",
+  "repository": "https://github.com/cm-wada-yusuke/template-aws-cdk-typescript-serverless-app.git",
+  "license": "UNLICENSED",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "dependencies": {
+    "source-map-support": "^0.5.19"
+  },
+  "devDependencies": {
+    "@types/jest": "26.0.7",
+    "@types/node": "^14.0.27",
+    "@typescript-eslint/eslint-plugin": "^3.7.1",
+    "@typescript-eslint/parser": "^3.7.1",
+    "add": "^2.0.6",
+    "husky": "^4.2.5",
+    "jest": "26.2.1",
+    "lint-staged": "^10.2.11",
+    "npm-check-updates": "^7.0.2",
+    "prettier": "^2.0.5",
+    "shx": "^0.3.2",
+    "ts-jest": "26.1.4",
+    "ts-node": "^8.10.2",
+    "typescript": "^3.9.7",
+    "yarn": "^1.22.4"
+  },
+  "scripts": {
+    "deploy": "yarn dist-lock && yarn workspace app-node dist && yarn workspace infra-aws deploy",
+    "dist": "yarn dist-lock && yarn workspace app-node dist && yarn workspace infra-aws dist",
+    "test": "yarn test:unit@infra && yarn test:unit@app && yarn test:e2e@app",
+    "build": "yarn workspace app-node build && yarn workspace infra-aws build",
+    "clean": "yarn workspace app-node clean && yarn workspace infra-aws clean",
+    "test:unit@app": "yarn workspace app-node test:unit",
+    "test:unit@infra": "yarn dist-lock && yarn workspace app-node dist && yarn workspace infra-aws dist && yarn workspace infra-aws test:unit",
+    "test:e2e@app": "yarn workspace app-node test:e2e",
+    "upgrade:show": "yarn workspace infra-aws upgrade:show && yarn workspace app-node upgrade:show",
+    "upgrade:do": "yarn workspace infra-aws upgrade:do && yarn workspace app-node upgrade:do",
+    "lint": "eslint --cache './packages/**/*.{ts,tsx}'",
+    "lint-fix": "eslint --cache --fix '**/*.{ts,tsx}'",
+    "dist-lock": "shx cp yarn.lock packages/app-node",
+    "lint-staged": "lint-staged",
+    "update": "yarn workspace infra-aws ncu -u && yarn workspace app-node ncu -u && ncu -u && yarn install"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.ts": [
+      "yarn run lint-fix",
+      "yarn run lint",
+      "git add"
+    ]
+  }
+}
