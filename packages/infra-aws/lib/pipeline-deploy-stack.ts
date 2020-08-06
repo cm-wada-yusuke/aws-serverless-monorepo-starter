@@ -1,18 +1,35 @@
 import * as cdk from '@aws-cdk/core';
-import { Construct, Stack } from '@aws-cdk/core';
+import { Construct, RemovalPolicy, Stack } from '@aws-cdk/core';
 import * as codePipeline from '@aws-cdk/aws-codepipeline';
 import { Pipeline } from '@aws-cdk/aws-codepipeline';
 import * as actions from '@aws-cdk/aws-codepipeline-actions';
 import * as codeBuild from '@aws-cdk/aws-codebuild';
 import { LinuxBuildImage } from '@aws-cdk/aws-codebuild';
 import * as iam from '@aws-cdk/aws-iam';
+import * as s3 from '@aws-cdk/aws-s3';
+import { DeployApproval, GlobalProps } from './global-props';
 
 export async function greetingDeployPipelineStack(
     scope: Construct,
     id: string,
+    global: GlobalProps,
 ): Promise<Stack> {
     const stack = new cdk.Stack(scope, id, {
-        stackName: 'DeployStack',
+        stackName: global.getStackName(id), // dev-ApplicationDeploy-stack
+    });
+
+    // call parameter store
+    const params = await global.pm.load();
+    const deployAppApproval = params.DeployApproval
+        ? (params.DeployApproval.Value as DeployApproval)
+        : 'required';
+
+    // artifact bucket
+    const deployBucket = new s3.Bucket(stack, 'deploy', {
+        encryption: s3.BucketEncryption.KMS,
+        bucketName: global.getBucketName('deploy', stack.region, stack.account),
+        versioned: false,
+        removalPolicy: RemovalPolicy.DESTROY,
     });
 
     const appOutput = new codePipeline.Artifact();
@@ -21,7 +38,7 @@ export async function greetingDeployPipelineStack(
         actionName: 'GitHubSourceAction',
         owner: 'cm-wada-yusuke',
         oauthToken: gitHubToken,
-        repo: 'template-aws-cdk-typescript-serverless-app',
+        repo: 'aws-serverless-monorepo-starter',
         branch: 'master',
         output: appOutput,
         runOrder: 1,
@@ -69,8 +86,9 @@ export async function greetingDeployPipelineStack(
         runOrder: 3,
     });
 
-    const pipeline = new Pipeline(stack, 'GreetingApplicationDeploy-pipeline', {
-        pipelineName: 'GreetingApplicationDeploy-pipeline',
+    const pipeline = new Pipeline(stack, 'GreetingApplicationDeploy', {
+        pipelineName: global.getPipelineName('GreetingApplicationDeploy'),
+        artifactBucket: deployBucket,
     });
 
     pipeline.addStage({
@@ -78,9 +96,15 @@ export async function greetingDeployPipelineStack(
         actions: [sourceAction],
     });
 
+    const deployStage: codePipeline.IAction[] = [applicationDeployAction];
+
+    if (deployAppApproval === 'required') {
+        deployStage.unshift(approvalAction);
+    }
+
     pipeline.addStage({
-        stageName: 'GreetingApplicationDeploy-stage',
-        actions: [approvalAction, applicationDeployAction],
+        stageName: 'YenqBackendApplicationDeploy-stage',
+        actions: deployStage,
     });
 
     return stack;

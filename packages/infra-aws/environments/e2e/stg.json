@@ -1,0 +1,11 @@
+[
+  {
+    "Name": "Stage",
+    "Value": "stg"
+  },
+  {
+    "Name": "ExternalServiceAccessKey",
+    "Value": "ABXY-stg",
+    "SecureString": true
+  }
+]

@@ -5,18 +5,18 @@
   "private": true,
   "dependencies": {
     "@bugsnag/node": "^7.2.1",
-    "@types/uuid": "^8.0.0",
-    "aws-sdk": "2.724.0",
+    "@types/uuid": "^8.0.1",
+    "aws-sdk": "2.727.1",
     "luxon": "^1.24.1",
     "uuid": "^8.3.0"
   },
   "devDependencies": {
     "@types/luxon": "^1.24.3",
     "@types/node": "^14.0.27",
-    "@types/uuid": "^8.0.0",
-    "jest-circus": "^26.2.1",
+    "@types/uuid": "^8.0.1",
+    "jest-circus": "^26.2.2",
     "shx": "^0.3.2",
-    "eslint": "^7.5.0",
+    "eslint": "^7.6.0",
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^3.1.4",

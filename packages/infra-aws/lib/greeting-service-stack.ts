@@ -1,14 +1,19 @@
 import * as cdk from '@aws-cdk/core';
 import { CfnOutput, Stack } from '@aws-cdk/core';
 import * as lambda from '@aws-cdk/aws-lambda';
-import { NODE_LAMBDA_LAYER_DIR, NODE_LAMBDA_SRC_DIR } from './processes/setup';
+import {
+    GlobalProps,
+    NODE_LAMBDA_LAYER_DIR,
+    NODE_LAMBDA_SRC_DIR,
+} from './global-props';
 
 export async function greetingServiceApplicationStack(
     scope: cdk.Construct,
     id: string,
+    global: GlobalProps,
 ): Promise<Stack> {
     const stack = new cdk.Stack(scope, id, {
-        stackName: 'application',
+        stackName: global.getStackName(id), // ex: dev-
     });
 
     // node_modules を格納する LayerVersion

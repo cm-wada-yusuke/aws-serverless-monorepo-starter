@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "Env",
+    "Value": "prd"
+  },
+  {
+    "Name": "DeployApproval",
+    "Value": "required"
+  },
+  {
+    "Name": "ExternalServiceAccessKey",
+    "Value": "ABXY-prd",
+    "SecureString": true
+  }
+]

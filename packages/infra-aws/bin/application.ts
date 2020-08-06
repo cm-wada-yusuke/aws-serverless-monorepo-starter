@@ -2,16 +2,14 @@
 import 'source-map-support/register';
 import * as cdk from '@aws-cdk/core';
 import { greetingServiceApplicationStack } from '../lib/greeting-service-stack';
-import { greetingDeployPipelineStack } from '../lib/pipeline-deploy-stack';
+import { getGlobal } from './common';
 
 async function buildApp(): Promise<void> {
     const app = new cdk.App();
+    const global = getGlobal(app);
 
     // Application stack
-    await greetingServiceApplicationStack(app, 'GreetingServiceStack');
-
-    // Deploy stack
-    await greetingDeployPipelineStack(app, 'DeployStack');
+    await greetingServiceApplicationStack(app, 'GreetingServiceStack', global);
 }
 
 buildApp();
