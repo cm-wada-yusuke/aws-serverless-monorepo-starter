@@ -6,16 +6,22 @@ import { LambdaContext } from '../../lambda-context';
  * @param context response data
  */
 export async function handler(
-    event: GreetingEvent,
+    event: AppSyncPassThroughInput,
     context?: LambdaContext,
 ): Promise<GreetingResponse> {
     console.info('event', JSON.stringify(event));
     console.info('context', JSON.stringify(context?.awsRequestId));
 
     return {
-        reply: `Fine, and you? > ${event.message}`,
+        reply: `Fine, and you? > ${event.arguments.input.message}`,
     };
 }
+
+type AppSyncPassThroughInput = {
+    arguments: {
+        input: GreetingEvent;
+    };
+};
 
 type GreetingEvent = {
     message: string;

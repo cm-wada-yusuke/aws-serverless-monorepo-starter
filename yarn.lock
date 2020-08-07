@@ -51,6 +51,19 @@
     "@aws-cdk/core" "1.56.0"
     constructs "^3.0.2"
 
+"@aws-cdk/aws-appsync@^1.56.0":
+  version "1.56.0"
+  resolved "https://registry.yarnpkg.com/@aws-cdk/aws-appsync/-/aws-appsync-1.56.0.tgz#b7ff2e10686bfefc3b1c107105c2fa1811c200d6"
+  integrity sha512-+otkBSh+TuiviErDk3J7PzvSnmyeZhatCKhgAX8AJbeWkfepmWi4io6qPCEzyxK4uRfCSalbzrX7brpQjsWlxg==
+  dependencies:
+    "@aws-cdk/aws-cognito" "1.56.0"
+    "@aws-cdk/aws-dynamodb" "1.56.0"
+    "@aws-cdk/aws-iam" "1.56.0"
+    "@aws-cdk/aws-lambda" "1.56.0"
+    "@aws-cdk/aws-s3-assets" "1.56.0"
+    "@aws-cdk/core" "1.56.0"
+    constructs "^3.0.2"
+
 "@aws-cdk/aws-autoscaling-common@1.56.0":
   version "1.56.0"
   resolved "https://registry.yarnpkg.com/@aws-cdk/aws-autoscaling-common/-/aws-autoscaling-common-1.56.0.tgz#664f4b8b9c53fe17f6a9c29337c5686fb3ebfe6c"
@@ -6021,11 +6034,6 @@ remove-trailing-separator@^1.0.1:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/remove-trailing-separator/-/remove-trailing-separator-1.1.0.tgz#c24bce2a283adad5bc3f58e0d48249b92379d8ef"
   integrity sha1-wkvOKig62tW8P1jg1IJJuSN52O8=
-
-removeNPMAbsolutePaths@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/removeNPMAbsolutePaths/-/removeNPMAbsolutePaths-2.0.0.tgz#462a51ecc59f27b10b7e8a909c1cbea20002ca88"
-  integrity sha512-Hea7U6iJcD0NE/aqBqxBMPKeKaxjqMNyTTajmH2dH9hhafJ9Tem5r4UeJK8+BdE1MK9lqoOYqNM0Sq9rl1OIbQ==
 
 repeat-element@^1.1.2:
   version "1.1.3"

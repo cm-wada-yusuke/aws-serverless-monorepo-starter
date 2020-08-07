@@ -38,7 +38,7 @@ export class GlobalProps {
     }
 
     getGraphApiName(id: string): string {
-        return `${this.stage}-${this.pm.appName}-${id}-graph`;
+        return `${this.stage}-${id}-graph`;
     }
 
     getLayerVersionName(id: string): string {
