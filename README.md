@@ -29,6 +29,7 @@ Using:
 and go deploy *greeting server application*:
 
 ```bash
+yarn workspace infra-aws cdk bootstrap ###first use of aws cdk, in your aws account.
 yarn deploy
 ```
 
@@ -59,6 +60,45 @@ less out.txt
 
 
 
+### AppSync GraphQL
 
-### React 
+You can request greeting GraphQL API via AWS Console GraphiQL.
+
+
+![aws_console_appsync.png](./aws_console_appsync.png)
+
+
+### React App
+
+Create React App and setup apollo client. We recommend set up your React application by yourself. Following are our examples.
+
+
+### Rename 
+
+Finally, rename your application.
+
+* package.json
+
+```diff
+-  "name": "template-aws-cdk-typescript-serverless-app",
++  "name": "good-health",
+  "version": "0.1.0",
+```
+
+
+* tsas-cdk.json
+
+This name uses generate aws resource name, for instance, when `appName` is `greeting-service`, its Lambda Function's name: `${env}-greeting-service-${FunctionName}-function`.
+ 
+
+```diff
+{
+-  "appName": "greeting-service",
++  "appName": "goot-health",
+  "region": "ap-northeast-1"
+}
+```  
+
+
+then, next deploy rename function to `${env}-greeting-service-${FunctionName}-function`.
 

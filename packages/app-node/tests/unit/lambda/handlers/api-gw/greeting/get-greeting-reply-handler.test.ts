@@ -1,4 +1,4 @@
-import { handler } from '../../../../../../src/lambda/handlers/api-gw/greeting/api-gw-get-greeting-reply-handler';
+import { handler } from '../../../../../../src/lambda/handlers/appsync/greeting/get-greeting-reply-handler';
 
 describe('test handler', (): void => {
     test('test handler response', async (): Promise<void> => {

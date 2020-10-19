@@ -1,0 +1,11 @@
+input Message {
+    message: String!
+}
+
+type Query {
+    getReply(input: Message): Reply!
+}
+
+type Reply {
+    reply: String!
+}

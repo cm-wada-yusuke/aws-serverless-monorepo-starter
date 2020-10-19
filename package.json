@@ -5,9 +5,19 @@
   "repository": "https://github.com/cm-wada-yusuke/template-aws-cdk-typescript-serverless-app.git",
   "license": "UNLICENSED",
   "private": true,
-  "workspaces": [
-    "packages/*"
-  ],
+  "workspaces": {
+    "packages": [
+      "packages/*"
+    ],
+    "nohoist": [
+      "**/react-scripts",
+      "**/react-scripts/**",
+      "**/jest",
+      "**/jest/**",
+      "**/eslint",
+      "**/eslint/**"
+    ]
+  },
   "dependencies": {
     "source-map-support": "^0.5.19"
   },
@@ -29,8 +39,9 @@
     "yarn": "^1.22.10"
   },
   "scripts": {
-    "deploy": "yarn dist-lock && yarn workspace app-node dist && yarn workspace infra-aws deploy",
+    "deploy": "yarn params:push && yarn dist-lock && yarn workspace app-node dist && yarn workspace infra-aws deploy",
     "dist": "yarn dist-lock && yarn workspace app-node dist && yarn workspace infra-aws dist",
+    "params:push": "yarn workspace infra-aws params:push",
     "test": "yarn test:unit@infra && yarn test:unit@app && yarn test:e2e@app",
     "build": "yarn workspace app-node build && yarn workspace infra-aws build",
     "clean": "yarn workspace app-node clean && yarn workspace infra-aws clean",
