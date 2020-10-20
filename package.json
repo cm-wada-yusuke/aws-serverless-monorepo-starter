@@ -14,6 +14,8 @@
       "**/react-scripts/**",
       "**/jest",
       "**/jest/**",
+      "**/ts-jest",
+      "**/ts-jest/**",
       "**/eslint",
       "**/eslint/**"
     ]
@@ -22,21 +24,12 @@
     "source-map-support": "^0.5.19"
   },
   "devDependencies": {
-    "@types/jest": "26.0.14",
-    "@types/node": "^14.11.10",
-    "@typescript-eslint/eslint-plugin": "^4.4.1",
-    "@typescript-eslint/parser": "^4.4.1",
     "add": "^2.0.6",
     "husky": "^4.3.0",
-    "jest": "26.5.3",
     "lint-staged": "^10.4.2",
     "npm-check-updates": "^9.1.0",
     "prettier": "^2.1.2",
-    "shx": "^0.3.2",
-    "ts-jest": "26.4.1",
-    "ts-node": "^9.0.0",
-    "typescript": "^4.0.3",
-    "yarn": "^1.22.10"
+    "shx": "^0.3.2"
   },
   "scripts": {
     "deploy": "yarn params:push && yarn dist-lock && yarn workspace app-node dist && yarn workspace infra-aws deploy",
@@ -46,12 +39,12 @@
     "build": "yarn workspace app-node build && yarn workspace infra-aws build",
     "clean": "yarn workspace app-node clean && yarn workspace infra-aws clean",
     "test:unit@app": "yarn workspace app-node test:unit",
-    "test:unit@infra": "yarn dist-lock && yarn workspace app-node dist && yarn workspace infra-aws dist && yarn workspace infra-aws test:unit",
+    "test:unit@infra": "yarn dist-lock && yarn workspace app-node dist && yarn workspace infra-aws test:unit",
     "test:e2e@app": "yarn workspace app-node test:e2e",
     "upgrade:show": "yarn workspace infra-aws upgrade:show && yarn workspace app-node upgrade:show",
     "upgrade:do": "yarn workspace infra-aws upgrade:do && yarn workspace app-node upgrade:do",
-    "lint": "eslint --cache './packages/**/*.{ts,tsx}'",
-    "lint-fix": "eslint --cache --fix '**/*.{ts,tsx}'",
+    "lint": "yarn workspace app-node lint && yarn workspace infra-aws lint",
+    "lint-fix": "yarn workspace app-node lint-fix && yarn workspace infra-aws lint-fix",
     "dist-lock": "shx cp yarn.lock packages/app-node",
     "lint-staged": "lint-staged",
     "update": "yarn workspace infra-aws ncu -u && yarn workspace app-node ncu -u && ncu -u && yarn install"

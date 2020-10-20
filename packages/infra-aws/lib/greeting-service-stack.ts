@@ -77,6 +77,11 @@ export async function greetingServiceApplicationStack(
         fieldName: 'getReply',
     });
 
+    new ssm.StringParameter(stack, 'GetGreetingReplyFnArn', {
+        stringValue: greetingFn.functionArn,
+        parameterName: global.pm.fullKeyOf('GetGreetingReplyFnArn', 'e2e'),
+    });
+
     new ssm.StringParameter(stack, 'GreetingGraphApiEndpoint', {
         stringValue: graphApi.graphqlUrl,
         parameterName: global.pm.fullKeyOf('GreetingGraphApiEndpoint'),

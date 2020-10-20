@@ -18,15 +18,13 @@
     "inlineSourceMap": true,
     "inlineSources": true,
     "experimentalDecorators": true,
-    "strictPropertyInitialization": false,
-    "typeRoots": [
-      "./node_modules/@types"
-    ]
+    "strictPropertyInitialization": false
   },
   "exclude": [
     "node_modules",
     "cdk.out",
     "dist",
-    "coverage"
+    "coverage",
+    "packages/site-react"
   ]
 }

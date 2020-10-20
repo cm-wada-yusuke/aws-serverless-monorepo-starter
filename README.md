@@ -28,14 +28,14 @@ Using:
 
 and go deploy *greeting server application*:
 
-```bash
+```shell script
 yarn workspace infra-aws cdk bootstrap ###first use of aws cdk, in your aws account.
 yarn deploy
 ```
 
 You can invoke greeting function after deploy.
 
-```bash
+```shell script
 aws lambda invoke \
 --payload '{"message": "Hi, how do you feel?"}' \
 --function-name <greeting function arn> \
@@ -46,7 +46,7 @@ out.txt
 
 Example: 
 
-```bash
+```shell script
 aws lambda invoke \
 --payload '{"message": "Hi, how do you feel?"}' \
 --function-name 'arn:aws:lambda:ap-northeast-1:12345667890:function:getGreetingReply-function' \
@@ -68,9 +68,47 @@ You can request greeting GraphQL API via AWS Console GraphiQL.
 ![aws_console_appsync.png](./aws_console_appsync.png)
 
 
+### Test?
+
+#### unit testing
+
+```shell script
+yarn test:unit@app
+yarn test:unit@infra
+```
+
+Will testing local files.
+
+#### E2E testing
+
+```shell script
+yarn deploy
+yarn test:e2e@app
+```
+
+Will testing deployed Lambda Function invoke.
+
+
 ### React App
 
 Create React App and setup apollo client. We recommend set up your React application by yourself. Following are our examples.
+
+```shell script
+# re-install packages for 'nohoist'
+yarn create react-app packages/site-react --template typescript
+rm -r node_modules/
+rm -r packages/app-node/node_modules/
+rm -r packages/infra-aws/node_modules/
+rm -r yarn.lock
+
+yarn install
+```
+
+Then, we can start react app.
+
+```shell script
+yarn workspace site-react start
+```
 
 
 ### Rename 
@@ -90,6 +128,8 @@ Finally, rename your application.
 
 This name uses generate aws resource name, for instance, when `appName` is `greeting-service`, its Lambda Function's name: `${env}-greeting-service-${FunctionName}-function`.
  
+ * `packages/infra-aws/tsas-cdk.config.json`
+ * `packages/app-node/tsas-cdk.config.json`
 
 ```diff
 {
