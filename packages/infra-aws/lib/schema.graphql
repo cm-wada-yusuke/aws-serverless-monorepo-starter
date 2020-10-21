@@ -2,8 +2,23 @@ input Message {
     message: String!
 }
 
+type MessageTemplate {
+    id: String!
+    message: String!
+}
+
+type HelloStatus {
+    status: String!
+    output: String
+}
+
 type Query {
     getReply(input: Message): Reply!
+    getHelloWorldStatus(executionArn: String): HelloStatus
+}
+
+type Mutation {
+    createTemplate(input: Message): MessageTemplate!
 }
 
 type Reply {

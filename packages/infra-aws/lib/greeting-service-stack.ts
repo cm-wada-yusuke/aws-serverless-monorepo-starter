@@ -1,9 +1,17 @@
 import * as cdk from '@aws-cdk/core';
-import { CfnOutput, Stack } from '@aws-cdk/core';
-import * as ssm from '@aws-cdk/aws-ssm';
+import { Stack } from '@aws-cdk/core';
+import * as dynamo from '@aws-cdk/aws-dynamodb';
+import { AttributeType } from '@aws-cdk/aws-dynamodb';
 import * as lambda from '@aws-cdk/aws-lambda';
+import { Tracing } from '@aws-cdk/aws-lambda';
 import * as appsync from '@aws-cdk/aws-appsync';
-import { AuthorizationType, FieldLogLevel } from '@aws-cdk/aws-appsync';
+import {
+    AuthorizationType,
+    FieldLogLevel,
+    MappingTemplate,
+    PrimaryKey,
+    Values,
+} from '@aws-cdk/aws-appsync';
 import {
     GlobalProps,
     NODE_LAMBDA_LAYER_DIR,
@@ -42,12 +50,13 @@ export async function greetingServiceApplicationStack(
         environment: {
             REGION: cdk.Stack.of(stack).region,
         },
+        tracing: Tracing.ACTIVE,
     });
 
     const graphApi = new appsync.GraphqlApi(stack, 'GreetingBff', {
         name: global.getGraphApiName('GreetingBff'),
         logConfig: {
-            excludeVerboseContent: true,
+            excludeVerboseContent: false,
             fieldLogLevel: FieldLogLevel.ALL,
         },
         authorizationConfig: {
@@ -77,24 +86,74 @@ export async function greetingServiceApplicationStack(
         fieldName: 'getReply',
     });
 
-    new ssm.StringParameter(stack, 'GetGreetingReplyFnArn', {
-        stringValue: greetingFn.functionArn,
-        parameterName: global.pm.fullKeyOf('GetGreetingReplyFnArn', 'e2e'),
+    /**
+     * Greeting Template DynamoDB
+     */
+    const templateTable = new dynamo.Table(stack, 'TemplateTable', {
+        tableName: global.getTableName('Template'),
+        partitionKey: { name: 'id', type: AttributeType.STRING },
     });
 
-    new ssm.StringParameter(stack, 'GreetingGraphApiEndpoint', {
-        stringValue: graphApi.graphqlUrl,
-        parameterName: global.pm.fullKeyOf('GreetingGraphApiEndpoint'),
+    // DynamoDB DataSource
+    const ddbSource = graphApi.addDynamoDbDataSource(
+        'TemplateTableDataSource',
+        templateTable,
+    );
+    ddbSource.createResolver({
+        typeName: 'Mutation',
+        fieldName: 'createTemplate',
+        requestMappingTemplate: MappingTemplate.dynamoDbPutItem(
+            PrimaryKey.partition('id').auto(),
+            Values.projecting('input'),
+        ),
+        responseMappingTemplate: MappingTemplate.dynamoDbResultItem(),
     });
 
-    new CfnOutput(stack, 'GreetingFunctionArn', {
-        exportName: 'GreetingFunctionArn',
-        value: greetingFn.functionArn,
-    });
+    const stepFunctionsDatasource = graphApi.addHttpDataSource(
+        'StepFunctions',
+        'https://states.ap-northeast-1.amazonaws.com',
+        {
+            name: 'StepFunctionsDataSource',
+            authorizationConfig: {
+                signingRegion: 'ap-northeast-1',
+                signingServiceName: 'states',
+            },
+        },
+    );
 
-    new CfnOutput(stack, 'GreetingGraphApiEndpointOutput', {
-        exportName: 'GreetingGraphApiEndpointOutput',
-        value: graphApi.graphqlUrl,
+    stepFunctionsDatasource.createResolver({
+        typeName: 'Query',
+        fieldName: 'getHelloWorldStatus',
+        requestMappingTemplate: MappingTemplate.fromString(`
+{
+  "version": "2018-05-29",
+  "method": "POST",
+  "resourcePath": "/",
+  "params": {
+    "headers": {
+      "content-type": "application/x-amz-json-1.0",
+      "x-amz-target":"AWSStepFunctions.DescribeExecution"
+    },
+    "body": {
+      "executionArn": "$ctx.arguments.executionArn"
+    }
+  }
+}
+`),
+        responseMappingTemplate: MappingTemplate.fromString(`
+## Raise a GraphQL field error in case of a datasource invocation error
+#if($ctx.error)
+  $util.error($ctx.error.message, $ctx.error.type)
+#end
+## if the response status code is not 200, then return an error. Else return the body **
+#if($ctx.result.statusCode == 200)
+    ## If response is 200, return the body.
+    $ctx.result.body
+#else
+    ## If response is not 200, append the response to error block.
+    $utils.appendError($ctx.result.body, "$ctx.result.statusCode")
+#end
+`),
     });
 
     return stack;
