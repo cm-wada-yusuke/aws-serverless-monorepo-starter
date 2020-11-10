@@ -2,6 +2,7 @@ import * as cdk from '@aws-cdk/core';
 import { Stack } from '@aws-cdk/core';
 import * as dynamo from '@aws-cdk/aws-dynamodb';
 import { AttributeType } from '@aws-cdk/aws-dynamodb';
+import * as sfn from '@aws-cdk/aws-stepfunctions';
 import * as lambda from '@aws-cdk/aws-lambda';
 import { Tracing } from '@aws-cdk/aws-lambda';
 import * as appsync from '@aws-cdk/aws-appsync';
@@ -109,6 +110,12 @@ export async function greetingServiceApplicationStack(
         responseMappingTemplate: MappingTemplate.dynamoDbResultItem(),
     });
 
+    const helloMachine = sfn.StateMachine.fromStateMachineArn(
+        stack,
+        'HelloMachine',
+        'arn:aws:states:ap-northeast-1:945068354201:stateMachine:Helloworld',
+    );
+
     const stepFunctionsDatasource = graphApi.addHttpDataSource(
         'StepFunctions',
         'https://states.ap-northeast-1.amazonaws.com',
@@ -120,6 +127,8 @@ export async function greetingServiceApplicationStack(
             },
         },
     );
+
+    helloMachine.grantRead(stepFunctionsDatasource);
 
     stepFunctionsDatasource.createResolver({
         typeName: 'Query',
