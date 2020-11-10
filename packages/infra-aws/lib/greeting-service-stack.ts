@@ -1,15 +1,10 @@
 import * as cdk from '@aws-cdk/core';
-import { CfnOutput, Stack } from '@aws-cdk/core';
-import * as ssm from '@aws-cdk/aws-ssm';
-import * as lambda from '@aws-cdk/aws-lambda';
-import * as appsync from '@aws-cdk/aws-appsync';
-import { AuthorizationType, FieldLogLevel } from '@aws-cdk/aws-appsync';
-import {
-    GlobalProps,
-    NODE_LAMBDA_LAYER_DIR,
-    NODE_LAMBDA_SRC_DIR,
-} from './global-props';
-import * as path from 'path';
+import { Stack } from '@aws-cdk/core';
+import * as dynamo from '@aws-cdk/aws-dynamodb';
+import { AttributeType } from '@aws-cdk/aws-dynamodb';
+import * as s3 from '@aws-cdk/aws-s3';
+import * as glue from '@aws-cdk/aws-glue';
+import { GlobalProps } from './global-props';
 
 export async function greetingServiceApplicationStack(
     scope: cdk.Construct,
@@ -20,81 +15,69 @@ export async function greetingServiceApplicationStack(
         stackName: global.getStackName(id),
     });
 
-    // node_modules LayerVersion
-    const nodeModulesLayer = new lambda.LayerVersion(
-        stack,
-        'NodeModulesLayer',
-        {
-            layerVersionName: 'NodeModulesLayer',
-            code: lambda.Code.fromAsset(NODE_LAMBDA_LAYER_DIR),
-            description: 'Node.js modules layer',
-            compatibleRuntimes: [lambda.Runtime.NODEJS_12_X],
-        },
-    );
-
-    const greetingFn = new lambda.Function(stack, 'GetGreetingReply', {
-        functionName: global.getFunctionName('GetGreetingReply'),
-        code: lambda.Code.fromAsset(NODE_LAMBDA_SRC_DIR),
-        handler:
-            'lambda/handlers/appsync/greeting/get-greeting-reply-handler.handler',
-        runtime: lambda.Runtime.NODEJS_12_X,
-        layers: [nodeModulesLayer],
-        environment: {
-            REGION: cdk.Stack.of(stack).region,
-        },
-    });
-
-    const graphApi = new appsync.GraphqlApi(stack, 'GreetingBff', {
-        name: global.getGraphApiName('GreetingBff'),
-        logConfig: {
-            excludeVerboseContent: true,
-            fieldLogLevel: FieldLogLevel.ALL,
-        },
-        authorizationConfig: {
-            defaultAuthorization: {
-                authorizationType: AuthorizationType.API_KEY,
-            },
-            additionalAuthorizationModes: [],
-        },
-        schema: appsync.Schema.fromAsset(
-            path.join(__dirname, 'schema.graphql'),
+    /**
+     * S3 for Dynamodb Export
+     */
+    const exportBucket = new s3.Bucket(stack, 'export', {
+        bucketName: global.getBucketName(
+            'export',
+            stack.account,
+            global.getDefaultAppRegion(),
         ),
-        xrayEnabled: true,
     });
-
-    // Lambda Function Datasource
-    // const greetingFnDataSource = graphApi.addLambdaDataSource(
-    const greetingFnDataSource = graphApi.addLambdaDataSource(
-        'GreetingFnDataSource',
-        greetingFn,
-    );
 
     /**
-     * Lambda Direct Resolvers
+     * Greeting Template DynamoDB
      */
-    greetingFnDataSource.createResolver({
-        typeName: 'Query',
-        fieldName: 'getReply',
+    new dynamo.Table(stack, 'TemplateTable', {
+        tableName: global.getTableName('Template'),
+        partitionKey: { name: 'id', type: AttributeType.STRING },
     });
 
-    new ssm.StringParameter(stack, 'GetGreetingReplyFnArn', {
-        stringValue: greetingFn.functionArn,
-        parameterName: global.pm.fullKeyOf('GetGreetingReplyFnArn', 'e2e'),
+    const db = new glue.Database(stack, 'GreetingDatabase', {
+        databaseName: global.getGlueDatabaseName('greeting'),
     });
-
-    new ssm.StringParameter(stack, 'GreetingGraphApiEndpoint', {
-        stringValue: graphApi.graphqlUrl,
-        parameterName: global.pm.fullKeyOf('GreetingGraphApiEndpoint'),
-    });
-
-    new CfnOutput(stack, 'GreetingFunctionArn', {
-        exportName: 'GreetingFunctionArn',
-        value: greetingFn.functionArn,
-    });
-
-    new CfnOutput(stack, 'GreetingGraphApiEndpointOutput', {
-        exportName: 'GreetingGraphApiEndpointOutput',
-        value: graphApi.graphqlUrl,
+    new glue.Table(stack, 'TemplateGlueTable', {
+        database: db,
+        tableName: 'template',
+        bucket: exportBucket,
+        s3Prefix:
+            'dev-greeting-service-Template-table/AWSDynamoDB/01604986918444-1c619ce8/data/',
+        dataFormat: glue.DataFormat.JSON,
+        columns: [
+            {
+                name: 'Item',
+                type: glue.Schema.struct([
+                    {
+                        name: 'id',
+                        type: glue.Schema.struct([
+                            {
+                                name: 'S',
+                                type: glue.Schema.STRING,
+                            },
+                        ]),
+                    },
+                    {
+                        name: 'message',
+                        type: glue.Schema.struct([
+                            {
+                                name: 'S',
+                                type: glue.Schema.STRING,
+                            },
+                        ]),
+                    },
+                    {
+                        name: 'usedTimes',
+                        type: glue.Schema.struct([
+                            {
+                                name: 'N',
+                                type: glue.Schema.INTEGER,
+                            },
+                        ]),
+                    },
+                ]),
+            },
+        ],
     });
 
     return stack;
