@@ -1,43 +1,43 @@
 {
-  "name": "app-node",
-  "version": "0.1.0",
-  "license": "MIT",
-  "private": true,
-  "dependencies": {
-    "@types/uuid": "^8.3.0",
-    "aws-sdk": "2.788.0",
-    "luxon": "^1.25.0",
-    "uuid": "^8.3.1"
-  },
-  "devDependencies": {
-    "@types/jest": "^26.0.15",
-    "@types/luxon": "^1.25.0",
-    "@types/node": "^14.14.7",
-    "@types/uuid": "^8.3.0",
-    "@typescript-eslint/eslint-plugin": "^4.7.0",
-    "@typescript-eslint/parser": "^4.7.0",
-    "eslint": "^7.13.0",
-    "eslint-config-prettier": "^6.15.0",
-    "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-prettier": "^3.1.4",
-    "jest": "^26.6.3",
-    "jest-circus": "^26.6.3",
-    "prettier": "^2.1.2",
-    "shx": "^0.3.3",
-    "ts-jest": "^26.4.4",
-    "typescript": "^4.0.5"
-  },
-  "scripts": {
-    "dist": "yarn clean+build+bundle",
-    "test:unit": "jest --config=jest.config.unit.js --coverage",
-    "test:e2e": "jest --config=jest.config.e2e.js --runInBand --testRunner='jest-circus/runner'",
-    "lint": "eslint --cache './**/*.{ts,tsx}'",
-    "lint-fix": "eslint --cache --fix './**/*.{ts,tsx}'",
-    "upgrade:show": "ncu",
-    "upgrade:do": "ncu -u",
-    "clean+build+bundle": "yarn clean && yarn build && yarn bundle",
-    "clean": "shx rm -rf dist/ && shx rm -rf coverage/",
-    "build": "tsc",
-    "bundle": "shx mkdir -p dist/layer/nodejs &&  shx cp yarn.lock dist/layer/nodejs &&  shx cp package.json dist/layer/nodejs && yarn --cwd dist/layer/nodejs --production install"
-  }
+    "name": "app-node",
+    "version": "0.1.0",
+    "license": "MIT",
+    "private": true,
+    "dependencies": {
+        "@types/uuid": "^8.3.0",
+        "aws-sdk": "2.788.0",
+        "luxon": "^1.25.0",
+        "uuid": "^8.3.1"
+    },
+    "devDependencies": {
+        "@types/jest": "^26.0.15",
+        "@types/luxon": "^1.25.0",
+        "@types/node": "^14.14.7",
+        "@types/uuid": "^8.3.0",
+        "@typescript-eslint/eslint-plugin": "^4.7.0",
+        "@typescript-eslint/parser": "^4.7.0",
+        "eslint": "^7.13.0",
+        "eslint-config-prettier": "^6.15.0",
+        "eslint-plugin-node": "^11.1.0",
+        "import-sort-style-module": "^6.0.0",
+        "jest": "^26.6.3",
+        "jest-circus": "^26.6.3",
+        "prettier": "^2.1.2",
+        "shx": "^0.3.3",
+        "ts-jest": "^26.4.4",
+        "typescript": "^4.0.5"
+    },
+    "scripts": {
+        "dist": "yarn clean+build+bundle",
+        "test:unit": "jest --config=jest.config.unit.js --coverage",
+        "test:e2e": "jest --config=jest.config.e2e.js --runInBand --testRunner='jest-circus/runner'",
+        "lint": "eslint --cache './**/*.{ts,tsx}'",
+        "lint-fix": "yarn run eslint --cache --fix './**/*.{ts,tsx}' && yarn run prettier --write './**/*.{ts,tsx}'",
+        "upgrade:show": "ncu",
+        "upgrade:do": "ncu -u",
+        "clean+build+bundle": "yarn clean && yarn build && yarn bundle",
+        "clean": "shx rm -rf dist/ && shx rm -rf coverage/",
+        "build": "tsc",
+        "bundle": "shx mkdir -p dist/layer/nodejs &&  shx cp yarn.lock dist/layer/nodejs &&  shx cp package.json dist/layer/nodejs && yarn --cwd dist/layer/nodejs --production install"
+    }
 }

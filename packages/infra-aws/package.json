@@ -42,7 +42,7 @@
     "@aws-cdk/aws-s3": "1.72.0",
     "@aws-cdk/aws-s3-assets": "1.72.0",
     "@aws-cdk/aws-sam": "1.72.0",
-    "@aws-cdk/aws-secretsmanager": "1.72.0",
+    "@aws-cdk/aws-secretsmanager": "1.72.0",qq
     "@aws-cdk/aws-servicediscovery": "1.72.0",
     "@aws-cdk/aws-sns": "1.72.0",
     "@aws-cdk/aws-sns-subscriptions": "1.72.0",
@@ -55,20 +55,20 @@
     "@aws-cdk/cx-api": "1.72.0",
     "@aws-cdk/region-info": "1.72.0",
     "@types/fs-extra": "^9.0.3",
+    "@typescript-eslint/eslint-plugin": "^4.7.0",
+    "@typescript-eslint/parser": "^4.7.0",
     "aws-cdk": "1.72.0",
     "constructs": "3.2.19",
+    "eslint": "^7.13.0",
     "eslint-config-prettier": "^6.15.0",
     "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-prettier": "^3.1.4",
     "fs-extra": "^9.0.1",
+    "import-sort-style-module": "^6.0.0",
     "jest": "^26.6.3",
     "prettier": "^2.1.2",
     "source-map-support": "^0.5.19",
     "ts-jest": "^26.4.4",
-    "tsas-cdk": "0.0.21",
-    "@typescript-eslint/eslint-plugin": "^4.7.0",
-    "@typescript-eslint/parser": "^4.7.0",
-    "eslint": "^7.13.0"
+    "tsas-cdk": "0.0.21"
   },
   "config": {
     "appStacks": "GreetingServiceStack",
@@ -78,7 +78,7 @@
   "scripts": {
     "deploy": "cdk deploy --require-approval never $npm_package_config_appStacks",
     "lint": "eslint --cache './**/*.{ts,tsx}'",
-    "lint-fix": "eslint --cache --fix './**/*.{ts,tsx}'",
+    "lint-fix": "yarn run eslint --cache --fix './**/*.{ts,tsx}' && yarn run prettier --write './**/*.{ts,tsx}'",
     "upgrade:show": "ncu",
     "upgrade:do": "ncu -u",
     "params:push": "tsas-cdk param put-all --stage ${STAGE:-dev} && tsas-cdk param put-all --stage ${STAGE:-dev} --division e2e",

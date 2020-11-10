@@ -1,4 +1,4 @@
 {
-  "appName": "greeting-service",
-  "region": "ap-northeast-1"
+    "appName": "greeting-service",
+    "region": "ap-northeast-1"
 }
