@@ -25,9 +25,9 @@
   },
   "devDependencies": {
     "add": "^2.0.6",
-    "husky": "^4.3.4",
+    "husky": "^4.3.5",
     "lint-staged": "^10.5.3",
-    "npm-check-updates": "^10.2.2",
+    "npm-check-updates": "^10.2.5",
     "prettier": "^2.2.1",
     "shx": "^0.3.3"
   },
