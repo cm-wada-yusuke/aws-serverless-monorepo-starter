@@ -1,11 +1,18 @@
-input Message {
+input EntryInput {
+    name: String!
+    message: String!
+}
+type Entry {
+    userId: String!
+    name: String!
     message: String!
 }
 
 type Query {
-    getReply(input: Message): Reply!
+    getEntry(input: EntryInput): Entry!
 }
 
-type Reply {
-    reply: String!
+type Mutation {
+    updateEntry(userId: ID!, lastUpdateAt: Float!, input: EntryInput!): Entry!
 }
+

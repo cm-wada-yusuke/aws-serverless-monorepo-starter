@@ -1,15 +1,17 @@
 import * as cdk from '@aws-cdk/core';
 import { CfnOutput, Stack } from '@aws-cdk/core';
 import * as ssm from '@aws-cdk/aws-ssm';
-import * as lambda from '@aws-cdk/aws-lambda';
+import * as dynamodb from '@aws-cdk/aws-dynamodb';
+import { AttributeType, BillingMode } from '@aws-cdk/aws-dynamodb';
 import * as appsync from '@aws-cdk/aws-appsync';
-import { AuthorizationType, FieldLogLevel } from '@aws-cdk/aws-appsync';
 import {
-    GlobalProps,
-    NODE_LAMBDA_LAYER_DIR,
-    NODE_LAMBDA_SRC_DIR,
-} from './global-props';
+    AuthorizationType,
+    FieldLogLevel,
+    MappingTemplate,
+} from '@aws-cdk/aws-appsync';
+import { GlobalProps } from './global-props';
 import * as path from 'path';
+import { updateItemMappingTemplate } from './update-item-template';
 
 export async function greetingServiceApplicationStack(
     scope: cdk.Construct,
@@ -20,32 +22,19 @@ export async function greetingServiceApplicationStack(
         stackName: global.getStackName(id),
     });
 
-    // node_modules LayerVersion
-    const nodeModulesLayer = new lambda.LayerVersion(
-        stack,
-        'NodeModulesLayer',
-        {
-            layerVersionName: 'NodeModulesLayer',
-            code: lambda.Code.fromAsset(NODE_LAMBDA_LAYER_DIR),
-            description: 'Node.js modules layer',
-            compatibleRuntimes: [lambda.Runtime.NODEJS_12_X],
-        },
-    );
-
-    const greetingFn = new lambda.Function(stack, 'GetGreetingReply', {
-        functionName: global.getFunctionName('GetGreetingReply'),
-        code: lambda.Code.fromAsset(NODE_LAMBDA_SRC_DIR),
-        handler:
-            'lambda/handlers/appsync/greeting/get-greeting-reply-handler.handler',
-        runtime: lambda.Runtime.NODEJS_12_X,
-        layers: [nodeModulesLayer],
-        environment: {
-            REGION: cdk.Stack.of(stack).region,
+    const entryTable = new dynamodb.Table(scope, 'EntryTable', {
+        tableName: global.getTableName('Entry'),
+        billingMode: BillingMode.PROVISIONED,
+        readCapacity: 1,
+        writeCapacity: 1,
+        partitionKey: {
+            type: AttributeType.STRING,
+            name: 'id',
         },
     });
 
-    const graphApi = new appsync.GraphqlApi(stack, 'GreetingBff', {
-        name: global.getGraphApiName('GreetingBff'),
+    const graphApi = new appsync.GraphqlApi(stack, 'EntryBff', {
+        name: global.getGraphApiName('EntryBff'),
         logConfig: {
             excludeVerboseContent: true,
             fieldLogLevel: FieldLogLevel.ALL,
@@ -64,36 +53,47 @@ export async function greetingServiceApplicationStack(
 
     // Lambda Function Datasource
     // const greetingFnDataSource = graphApi.addLambdaDataSource(
-    const greetingFnDataSource = graphApi.addLambdaDataSource(
-        'GreetingFnDataSource',
-        greetingFn,
+    const entryTableDataSource = graphApi.addDynamoDbDataSource(
+        'EntryTableDataSource',
+        entryTable,
     );
 
     /**
-     * Lambda Direct Resolvers
+     * DynamoDB Resolvers
      */
-    greetingFnDataSource.createResolver({
+    entryTableDataSource.createResolver({
         typeName: 'Query',
-        fieldName: 'getReply',
+        fieldName: 'getEntry',
+        requestMappingTemplate: MappingTemplate.dynamoDbGetItem('id', 'userId'),
+        responseMappingTemplate: MappingTemplate.dynamoDbResultItem(),
     });
 
-    new ssm.StringParameter(stack, 'GetGreetingReplyFnArn', {
-        stringValue: greetingFn.functionArn,
-        parameterName: global.pm.fullKeyOf('GetGreetingReplyFnArn', 'e2e'),
+    entryTableDataSource.createResolver({
+        typeName: 'Mutation',
+        fieldName: 'updateEntry',
+        requestMappingTemplate: MappingTemplate.fromString(
+            updateItemMappingTemplate({
+                partitionKey: {
+                    keyName: 'id',
+                    attributePath: 'userId',
+                },
+                version: {
+                    keyName: 'updateAt',
+                    attributePath: 'lastUpdateAt',
+                },
+                inputPath: 'input',
+            }),
+        ),
+        responseMappingTemplate: MappingTemplate.dynamoDbResultItem(),
     });
 
-    new ssm.StringParameter(stack, 'GreetingGraphApiEndpoint', {
+    new ssm.StringParameter(stack, 'EntryGraphApiEndpoint', {
         stringValue: graphApi.graphqlUrl,
-        parameterName: global.pm.fullKeyOf('GreetingGraphApiEndpoint'),
+        parameterName: global.pm.fullKeyOf('EntryGraphApiEndpoint'),
     });
 
-    new CfnOutput(stack, 'GreetingFunctionArn', {
-        exportName: 'GreetingFunctionArn',
-        value: greetingFn.functionArn,
-    });
-
-    new CfnOutput(stack, 'GreetingGraphApiEndpointOutput', {
-        exportName: 'GreetingGraphApiEndpointOutput',
+    new CfnOutput(stack, 'EntryGraphApiEndpointOutput', {
+        exportName: 'EntryGraphApiEndpointOutput',
         value: graphApi.graphqlUrl,
     });
 
