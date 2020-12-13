@@ -14,15 +14,15 @@ import * as path from 'path';
 import { updateItemMappingTemplate } from './update-item-template';
 
 export async function greetingServiceApplicationStack(
-    scope: cdk.Construct,
+    app: cdk.App,
     id: string,
     global: GlobalProps,
 ): Promise<Stack> {
-    const stack = new cdk.Stack(scope, id, {
+    const stack = new cdk.Stack(app, id, {
         stackName: global.getStackName(id),
     });
 
-    const entryTable = new dynamodb.Table(scope, 'EntryTable', {
+    const entryTable = new dynamodb.Table(stack, 'EntryTable', {
         tableName: global.getTableName('Entry'),
         billingMode: BillingMode.PROVISIONED,
         readCapacity: 1,

@@ -9,7 +9,7 @@ async function buildApp(): Promise<void> {
     const global = getGlobal(app);
 
     // Application stack
-    await greetingServiceApplicationStack(app, 'GreetingServiceStack', global);
+    await greetingServiceApplicationStack(app, 'EntryServiceStack', global);
 }
 
 buildApp();

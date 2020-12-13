@@ -71,7 +71,7 @@
     "tsas-cdk": "0.0.21"
   },
   "config": {
-    "appStacks": "GreetingServiceStack",
+    "appStacks": "EntryServiceStack",
     "deployStacks": "DeployStack",
     "buildStacks": "BuildStack"
   },
