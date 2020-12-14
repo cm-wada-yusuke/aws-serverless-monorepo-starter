@@ -78,8 +78,8 @@ export async function greetingServiceApplicationStack(
                     attributePath: 'userId',
                 },
                 version: {
-                    keyName: 'updateAt',
-                    attributePath: 'lastUpdateAt',
+                    keyName: 'updateAtMillis',
+                    attributePath: 'lastUpdateAtMillis',
                 },
                 inputPath: 'input',
             }),

@@ -35,13 +35,18 @@ export function updateItemMappingTemplate(options: {
     #set( $expAdd = {} )
     #set( $expRemove = [] )
 
+    ## fixed versionId     
+    $!{expNames.put("#updateAtMillis", "updateAtMillis")}
+    $!{expValues.put(":updateAtMillis", $util.parseJson($util.dynamodb.toDynamoDBJson($util.time.nowEpochMilliSeconds())))}
+    $!{expSet.put("#updateAtMillis", ":updateAtMillis")}
+
     ## Iterate through each argument, skipping "id" **
     #foreach( $entry in $context.arguments.${attributeContextPath}entrySet() )
         #if( $entry.key != "${partitionKey.keyName}" )
             #if( (!$entry.value) && ("$!{entry.value}" == "") )
                 ## If the argument is set to "null", then remove that attribute from the item in DynamoDB **
 
-                #set( $discard = \${expRemove.add('#\${entry.key}')} )
+                #set( $discard = \${expRemove.add("#\${entry.key}")} )
                 $!{expNames.put("#\${entry.key}", "$entry.key")}
             #else
                 ## Otherwise set (or update) the attribute on the item in DynamoDB **
@@ -100,9 +105,9 @@ export function updateItemMappingTemplate(options: {
     },
 
     "condition" : {
-        "expression"       : "${version.keyName} = :version",
+        "expression"       : "updateAtMillis = :lastUpdateAtMillis OR attribute_not_exists(updateAtMillis)",
         "expressionValues" : {
-            ":version" : $util.dynamodb.toDynamoDBJson($context.arguments.${version.attributePath})
+            ":lastUpdateAtMillis" : $util.dynamodb.toDynamoDBJson($context.arguments.${version.attributePath})
         }
     }
 }

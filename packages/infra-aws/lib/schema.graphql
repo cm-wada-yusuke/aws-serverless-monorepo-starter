@@ -1,18 +1,20 @@
 input EntryInput {
-    name: String!
-    message: String!
+    name: String
+    message: String
 }
+
 type Entry {
-    userId: String!
-    name: String!
-    message: String!
+    id: String!
+    name: String
+    message: String
+    updateAtMillis: Float!
 }
 
 type Query {
-    getEntry(input: EntryInput): Entry!
+    getEntry(userId: String!): Entry!
 }
 
 type Mutation {
-    updateEntry(userId: ID!, lastUpdateAt: Float!, input: EntryInput!): Entry!
+    updateEntry(userId: ID!, lastUpdateAtMillis: Float!, input: EntryInput!): Entry!
 }
 
