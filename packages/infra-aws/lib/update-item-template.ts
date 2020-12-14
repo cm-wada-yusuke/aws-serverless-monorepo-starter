@@ -32,7 +32,6 @@ export function updateItemMappingTemplate(options: {
     #set( $expNames  = {} )
     #set( $expValues = {} )
     #set( $expSet = {} )
-    #set( $expAdd = {} )
     #set( $expRemove = [] )
 
     ## fixed versionId     
@@ -64,17 +63,6 @@ export function updateItemMappingTemplate(options: {
         #set( $expression = "SET" )
         #foreach( $entry in $expSet.entrySet() )
             #set( $expression = "\${expression} \${entry.key} = \${entry.value}" )
-            #if ( $foreach.hasNext )
-                #set( $expression = "\${expression}," )
-            #end
-        #end
-    #end
-
-    ## Continue building the update expression, adding attributes you're going to ADD **
-    #if( !\${expAdd.isEmpty()} )
-        #set( $expression = "\${expression} ADD" )
-        #foreach( $entry in $expAdd.entrySet() )
-            #set( $expression = "\${expression} \${entry.key} \${entry.value}" )
             #if ( $foreach.hasNext )
                 #set( $expression = "\${expression}," )
             #end

@@ -51,8 +51,6 @@ export async function greetingServiceApplicationStack(
         xrayEnabled: true,
     });
 
-    // Lambda Function Datasource
-    // const greetingFnDataSource = graphApi.addLambdaDataSource(
     const entryTableDataSource = graphApi.addDynamoDbDataSource(
         'EntryTableDataSource',
         entryTable,

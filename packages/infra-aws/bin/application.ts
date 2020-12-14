@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import 'source-map-support/register';
 import * as cdk from '@aws-cdk/core';
-import { greetingServiceApplicationStack } from '../lib/greeting-service-stack';
+import { greetingServiceApplicationStack } from '../lib/entry-service-stack';
 import { getGlobal } from './common';
 
 async function buildApp(): Promise<void> {

@@ -1,6 +1,6 @@
 import { expect as expectCDK, haveResource } from '@aws-cdk/assert';
 import * as cdk from '@aws-cdk/core';
-import { greetingServiceApplicationStack } from '../lib/greeting-service-stack';
+import { greetingServiceApplicationStack } from '../lib/entry-service-stack';
 import { getGlobal } from '../bin/common';
 
 test('Empty Stack', async () => {
