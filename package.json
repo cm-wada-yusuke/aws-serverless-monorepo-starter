@@ -24,12 +24,12 @@
     "source-map-support": "^0.5.19"
   },
   "devDependencies": {
-    "add": "^2.0.6",
-    "husky": "^4.3.5",
-    "lint-staged": "^10.5.3",
-    "npm-check-updates": "^10.2.5",
-    "prettier": "^2.2.1",
-    "shx": "^0.3.3"
+    "add": "2.x",
+    "husky": "4.x",
+    "lint-staged": "10.x",
+    "npm-check-updates": "10.x",
+    "prettier": "2.x",
+    "shx": "0.x"
   },
   "scripts": {
     "deploy": "yarn clean && yarn params:push && yarn dist-lock && yarn workspace app-node dist && yarn workspace infra-aws deploy",
