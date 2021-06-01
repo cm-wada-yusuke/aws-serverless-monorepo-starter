@@ -8,10 +8,11 @@ import {
     AuthorizationType,
     FieldLogLevel,
     MappingTemplate,
+    PrimaryKey,
+    Values,
 } from '@aws-cdk/aws-appsync';
 import { GlobalProps } from './global-props';
 import * as path from 'path';
-import { updateItemMappingTemplate } from './update-item-template';
 
 export async function greetingServiceApplicationStack(
     app: cdk.App,
@@ -22,14 +23,25 @@ export async function greetingServiceApplicationStack(
         stackName: global.getStackName(id),
     });
 
-    const entryTable = new dynamodb.Table(stack, 'EntryTable', {
-        tableName: global.getTableName('Entry'),
+    const entryQueueTable = new dynamodb.Table(stack, 'EntryQueueTable', {
+        tableName: global.getTableName('EntryQueue'),
         billingMode: BillingMode.PROVISIONED,
         readCapacity: 1,
         writeCapacity: 1,
         partitionKey: {
             type: AttributeType.STRING,
             name: 'id',
+        },
+    });
+    entryQueueTable.addGlobalSecondaryIndex({
+        indexName: 'inFlight-entryAtMillis-index',
+        partitionKey: {
+            type: AttributeType.NUMBER,
+            name: 'inFlight',
+        },
+        sortKey: {
+            type: AttributeType.NUMBER,
+            name: 'entryAtMillis',
         },
     });
 
@@ -53,7 +65,7 @@ export async function greetingServiceApplicationStack(
 
     const entryTableDataSource = graphApi.addDynamoDbDataSource(
         'EntryTableDataSource',
-        entryTable,
+        entryQueueTable,
     );
 
     /**
@@ -68,19 +80,10 @@ export async function greetingServiceApplicationStack(
 
     entryTableDataSource.createResolver({
         typeName: 'Mutation',
-        fieldName: 'updateEntry',
-        requestMappingTemplate: MappingTemplate.fromString(
-            updateItemMappingTemplate({
-                partitionKey: {
-                    keyName: 'id',
-                    attributePath: 'userId',
-                },
-                version: {
-                    keyName: 'updateAtMillis',
-                    attributePath: 'lastUpdateAtMillis',
-                },
-                inputPath: 'input',
-            }),
+        fieldName: 'putEntry',
+        requestMappingTemplate: MappingTemplate.dynamoDbPutItem(
+            PrimaryKey.partition('id').is('userId'),
+            Values.projecting('input'),
         ),
         responseMappingTemplate: MappingTemplate.dynamoDbResultItem(),
     });

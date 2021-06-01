@@ -1,28 +1,28 @@
-input MetadataInput {
-    entryAtMillis: Float
-}
 input EntryInput {
-    name: String
-    message: String
-    age: Int
-    winMark: Boolean
-    meta: MetadataInput
-    friends: [String]
+    name: String!
+    inFlight: Int!
+    status: String!
+    entryAtMillis: Float!
 }
 
-
-type Metadata {
-    entryAtMillis: Float
+type ItemContent {
+    name: String!
+    prize: Int!
 }
+
+type EntryResult {
+    status: String!
+    winMarK: Boolean
+    itemId: String
+    content: ItemContent
+}
+
 type Entry {
     id: String!
     name: String
-    message: String
-    age: Int
-    winMark: Boolean
-    meta: Metadata
-    friends: [String]
-    updateAtMillis: Float!
+    inFlight: Int
+    entryAtMillis: Float!
+    result: EntryResult
 }
 
 type Query {
@@ -30,6 +30,6 @@ type Query {
 }
 
 type Mutation {
-    updateEntry(userId: ID!, lastUpdateAtMillis: Float!, input: EntryInput!): Entry!
+    putEntry(userId: ID!, input: EntryInput!): Entry!
 }
 
