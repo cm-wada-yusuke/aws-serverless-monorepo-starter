@@ -28,7 +28,7 @@ export async function greetingServiceApplicationStack(
             layerVersionName: 'NodeModulesLayer',
             code: lambda.Code.fromAsset(NODE_LAMBDA_LAYER_DIR),
             description: 'Node.js modules layer',
-            compatibleRuntimes: [lambda.Runtime.NODEJS_12_X],
+            compatibleRuntimes: [lambda.Runtime.NODEJS_14_X],
         },
     );
 
@@ -37,7 +37,7 @@ export async function greetingServiceApplicationStack(
         code: lambda.Code.fromAsset(NODE_LAMBDA_SRC_DIR),
         handler:
             'lambda/handlers/appsync/greeting/get-greeting-reply-handler.handler',
-        runtime: lambda.Runtime.NODEJS_12_X,
+        runtime: lambda.Runtime.NODEJS_14_X,
         layers: [nodeModulesLayer],
         environment: {
             REGION: cdk.Stack.of(stack).region,

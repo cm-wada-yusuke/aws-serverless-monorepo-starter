@@ -71,16 +71,13 @@
     "tsas-cdk": "0.x"
   },
   "config": {
-    "appStacks": "GreetingServiceStack",
-    "deployStacks": "DeployStack",
+    "appStacks": "BlogServiceStack",
     "buildStacks": "BuildStack"
   },
   "scripts": {
-    "deploy": "cdk deploy --require-approval never $npm_package_config_appStacks",
-    "lint": "eslint --cache './**/*.{ts,tsx}'",
+    "deploy": "cdk deploy --app 'npx ts-node bin/blog.ts' --require-approval never $npm_package_config_appStacks",
+    "lint": "eslint --cache './**/*.{ts,tsx}' && prettier --check './**/*.{ts,tsx}'",
     "lint-fix": "yarn run eslint --cache --fix './**/*.{ts,tsx}' && yarn run prettier --write './**/*.{ts,tsx}'",
-    "upgrade:show": "ncu",
-    "upgrade:do": "ncu -u",
     "params:push": "tsas-cdk param put-all --stage ${STAGE:-dev} && tsas-cdk param put-all --stage ${STAGE:-dev} --division e2e",
     "test:unit": "jest --config=jest.config.unit.js --coverage",
     "diff": "cdk diff $npm_package_config_app-stacks",

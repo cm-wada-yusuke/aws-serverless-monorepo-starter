@@ -10,14 +10,12 @@
       "packages/*"
     ],
     "nohoist": [
-      "**/react-scripts",
-      "**/react-scripts/**",
-      "**/jest",
-      "**/jest/**",
-      "**/ts-jest",
-      "**/ts-jest/**",
-      "**/eslint",
-      "**/eslint/**"
+      "**/app-node",
+      "**/app-node/**",
+      "**/infra-aws",
+      "**/infra-aws/**",
+      "**/next-server",
+      "**/next-server/**"
     ]
   },
   "dependencies": {
@@ -25,13 +23,13 @@
   },
   "devDependencies": {
     "add": "2.x",
-    "husky": "4.x",
-    "lint-staged": "10.x",
-    "npm-check-updates": "10.x",
+    "husky": "^6.0.0",
+    "lint-staged": "11.x",
     "prettier": "2.x",
     "shx": "0.x"
   },
   "scripts": {
+    "dev": "yarn workspace next-server dev",
     "deploy": "yarn params:push && yarn dist-lock && yarn workspace app-node dist && yarn workspace infra-aws deploy",
     "dist": "yarn dist-lock && yarn workspace app-node dist && yarn workspace infra-aws dist",
     "params:push": "yarn workspace infra-aws params:push",
@@ -41,18 +39,11 @@
     "test:unit@app": "yarn workspace app-node test:unit",
     "test:unit@infra": "yarn dist-lock && yarn workspace app-node dist && yarn workspace infra-aws test:unit",
     "test:e2e@app": "yarn workspace app-node test:e2e",
-    "upgrade:show": "yarn workspace infra-aws upgrade:show && yarn workspace app-node upgrade:show",
-    "upgrade:do": "yarn workspace infra-aws upgrade:do && yarn workspace app-node upgrade:do",
     "lint": "yarn workspace app-node lint && yarn workspace infra-aws lint",
     "lint-fix": "yarn workspace app-node lint-fix && yarn workspace infra-aws lint-fix",
     "dist-lock": "shx cp yarn.lock packages/app-node",
     "lint-staged": "lint-staged",
-    "update": "yarn workspace infra-aws ncu -u && yarn workspace app-node ncu -u && ncu -u && yarn install"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
+    "prepare": "husky install"
   },
   "lint-staged": {
     "*.ts": [
