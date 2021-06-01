@@ -13,7 +13,6 @@ import PostType from "../../types/post";
 import { GetServerSideProps } from "next";
 import * as aws from "aws-sdk";
 import Author from "../../types/author";
-import { ParsedUrlQuery } from "querystring";
 
 const Region = process.env.REGION!;
 const BlogTableName = process.env.BLOG_TABLE_NAME!;
