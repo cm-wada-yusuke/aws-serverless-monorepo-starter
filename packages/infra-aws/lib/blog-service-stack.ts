@@ -26,7 +26,8 @@ export async function blogServiceApplicationStack(
     });
 
     // for AppRunner
-    new iam.Role(stack, global.getRoleName('BlogServer'), {
+    new iam.Role(stack, 'BlogInstanceRole', {
+        roleName: global.getRoleName('BlogInstance'),
         assumedBy: new iam.ServicePrincipal('tasks.apprunner.amazonaws.com'),
         managedPolicies: [
             iam.ManagedPolicy.fromAwsManagedPolicyName(
