@@ -87,38 +87,40 @@ type Article = {
   createAt: string;
 };
 
-export const getServerSideProps: GetServerSideProps<Props, ParsedUrlQuery> =
-  async ({ params }) => {
-    console.log("params", params);
-    const result = await dynamodb
-      .query({
-        TableName: BlogTableName,
-        IndexName: "slug-createAt-index",
-        Limit: 1,
-        KeyConditionExpression: "#slug = :slug",
-        ExpressionAttributeNames: {
-          "#slug": "slug",
-        },
-        ExpressionAttributeValues: {
-          ":slug": (params?.slug as string) ?? "",
-        },
-      })
-      .promise();
-
-    const article: Article = result.Items![0] as Article;
-    console.log(article);
-
-    const content = await markdownToHtml(article.content);
-
-    return {
-      props: {
-        post: {
-          ...article,
-          content,
-        },
+export const getServerSideProps: GetServerSideProps<Props> = async ({
+  params,
+}) => {
+  console.log("params", params);
+  const result = await dynamodb
+    .query({
+      TableName: BlogTableName,
+      IndexName: "slug-createAt-index",
+      Limit: 1,
+      KeyConditionExpression: "#slug = :slug",
+      ExpressionAttributeNames: {
+        "#slug": "slug",
       },
-    };
+      ExpressionAttributeValues: {
+        ":slug": (params?.slug as string) ?? "",
+      },
+    })
+    .promise();
+
+  const article: Article = result.Items![0] as Article;
+  console.log(article);
+
+  const content = await markdownToHtml(article.content);
+
+  return {
+    props: {
+      post: {
+        ...article,
+        content,
+      },
+      morePosts: [],
+    },
   };
+};
 
 // export async function getStaticProps({ params }: Params) {
 //   const post = getPostBySlug(params.slug, [
