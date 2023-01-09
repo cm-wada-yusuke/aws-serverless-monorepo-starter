@@ -6,7 +6,7 @@
     "dependencies": {
         "@types/uuid": "8.x",
         "aws-sdk": "2.x",
-        "luxon": "1.x",
+        "luxon": "2.x",
         "uuid": "8.x"
     },
     "devDependencies": {
